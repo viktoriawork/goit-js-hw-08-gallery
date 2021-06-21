@@ -65,59 +65,108 @@ const galleryItems = [
 ];
 
 
-function showPopUp(event){
- 
-  event.preventDefault()
-  let popUpEl = document.getElementById('pop-up');
-  let popUpImg = document.getElementById('pop-up-img')
-  popUpImg.setAttribute('src', event.target.getAttribute("data-source"));
-  popUpEl.classList.toggle("is-open");
-}
-function hidePopUp(event){
- 
-  event.preventDefault()
-  let popUpEl = document.getElementById('pop-up');
-  let popUpImg = document.getElementById('pop-up-img')
-  popUpImg.removeAttribute('src');
-  popUpEl.classList.toggle("is-open");
-}
+// находим необходимые дом узлы
+const refs = {
+  galleryEl: document.querySelector('.js-gallery'),
+  divLightbox: document.querySelector('.js-lightbox'),
+  imgLightbox: document.querySelector('.lightbox__image'),
+  btnClose: document.querySelector('.lightbox__button'),
+  overlay: document.querySelector('.lightbox__overlay'),
+};
 
-function createListeners(){
-  let galleryEls = document.getElementsByClassName('gallery__item') || [];
-  
-  for(let i=0; i < galleryEls.length; i++){
-    galleryEls[i].addEventListener('click',showPopUp,false);
+const createGalleryFn = createGallery(galleryItems);
+refs.overlay.addEventListener('click', onBackdropClick);
+refs.galleryEl.addEventListener('click', onDocumentClick);
+refs.galleryEl.insertAdjacentHTML('afterbegin', createGalleryFn);
+
+
+// создаем разметку для галлерии
+function createGallery(galleryItems) {
+  return galleryItems.map(({ preview, description }) => {
+    return `<li class="gallery__item"><img class="gallery__image" src="${preview}" alt="${description}"></li>`
+  }).join('');
+};
+
+// Открытие модального окна по клику на элементе галереи.
+function onDocumentClick(event) {
+  if (event.target.tagName !== 'IMG') return false;
+
+  const imgSrc = event.target.getAttribute('src');
+
+  const preview = galleryItems.map(item => {
+    if (imgSrc === item.preview) {
+      refs.imgLightbox.setAttribute('src', item.original)
+    }
+  });
+
+  modalOpen();
+};
+
+function modalOpen() {
+  refs.divLightbox.classList.add('is-open');
+  document.addEventListener('keydown', onKeyPress);
+};
+
+
+// закрытие модального окна 
+function modalClose() {
+  refs.divLightbox.classList.remove('is-open');
+  refs.imgLightbox.setAttribute('src', '');
+};
+
+// по клику на кнопку button[data-action="close-lightbox"].
+refs.btnClose.addEventListener('click', (event) => {
+  modalClose();
+});
+
+// закрытие модального окна по клику на div.lightbox__overlay.
+function onBackdropClick(event) {
+  modalClose();
+};
+
+// закрытие модального окна по нажатию клавиши ESC и пролистывание изображений галереи.
+function onKeyPress(event) {
+  if (event.code === 'Escape') {
+    modalClose();
   }
-}
 
-function showGallery (){
-  let galleryEl= document.getElementById('gallery-container');
-  
-  for(let i = 0; i < galleryItems.length; i++ ){
-    galleryEl.innerHTML += `<li class="gallery__item"  >
-    <a
-      class="gallery__link"
-      href="${galleryItems[i].original}"
-      onclick="showPopUp()";
-    >
-      <img
-        class="gallery__image"
-        src="${galleryItems[i].preview}"
-        data-source="${galleryItems[i].original}"
-        alt="${galleryItems[i].description}"
-      />
-    </a>
-  </li>
-  `
-  }
-  
-  createListeners();
-  
-}
+  if (event.code === 'ArrowRight') {
+    showNext();
+  };
+
+  if (event.code === 'ArrowLeft') {
+    showPrevious();
+  };
+};
+
+function showNext() {
+  let nextIndex = getCurrentIndex() + 1;
+
+  if (nextIndex === galleryItems.length) {
+    nextIndex = 0;
+  };
+
+  const nextImgSrc = galleryItems[nextIndex].original;
+  refs.imgLightbox.setAttribute('src', nextImgSrc);
+};
 
 
+function showPrevious() {
+  let previousIndex = getCurrentIndex() - 1;
 
-  showGallery();
+  if (previousIndex < 0) {
+    previousIndex = galleryItems.length - 1;
+  };
 
-  document.getElementsByClassName('lightbox__button')[0].addEventListener('click',hidePopUp,false );
+  const previousImgSrc = galleryItems[previousIndex].original;
+  refs.imgLightbox.setAttribute('src', previousImgSrc);
+};
+
+function getCurrentIndex() {
+  const lightboxImgSrc = refs.imgLightbox.getAttribute('src');
+  const lightboxIndex = galleryItems.findIndex(item => {
+    return item.original === lightboxImgSrc;
+  });
+  return lightboxIndex;
+};
 
