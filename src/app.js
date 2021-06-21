@@ -65,7 +65,7 @@ const galleryItems = [
 ];
 
 
-// находим необходимые дом узлы
+
 const refs = {
   galleryEl: document.querySelector('.js-gallery'),
   divLightbox: document.querySelector('.js-lightbox'),
@@ -80,14 +80,14 @@ refs.galleryEl.addEventListener('click', onDocumentClick);
 refs.galleryEl.insertAdjacentHTML('afterbegin', createGalleryFn);
 
 
-// создаем разметку для галлерии
+
 function createGallery(galleryItems) {
   return galleryItems.map(({ preview, description }) => {
     return `<li class="gallery__item"><img class="gallery__image" src="${preview}" alt="${description}"></li>`
   }).join('');
 };
 
-// Открытие модального окна по клику на элементе галереи.
+
 function onDocumentClick(event) {
   if (event.target.tagName !== 'IMG') return false;
 
@@ -108,23 +108,23 @@ function modalOpen() {
 };
 
 
-// закрытие модального окна 
+
 function modalClose() {
   refs.divLightbox.classList.remove('is-open');
   refs.imgLightbox.setAttribute('src', '');
 };
 
-// по клику на кнопку button[data-action="close-lightbox"].
+
 refs.btnClose.addEventListener('click', (event) => {
   modalClose();
 });
 
-// закрытие модального окна по клику на div.lightbox__overlay.
+
 function onBackdropClick(event) {
   modalClose();
 };
 
-// закрытие модального окна по нажатию клавиши ESC и пролистывание изображений галереи.
+// закрытие модального окна по нажатию клавиши ESC 
 function onKeyPress(event) {
   if (event.code === 'Escape') {
     modalClose();
