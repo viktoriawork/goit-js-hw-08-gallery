@@ -64,8 +64,7 @@ const galleryItems = [
   },
 ];
 
-
-
+// поиск  дом узлов
 const refs = {
   galleryEl: document.querySelector('.js-gallery'),
   divLightbox: document.querySelector('.js-lightbox'),
@@ -80,14 +79,14 @@ refs.galleryEl.addEventListener('click', onDocumentClick);
 refs.galleryEl.insertAdjacentHTML('afterbegin', createGalleryFn);
 
 
-
+//  разметка для галлерии
 function createGallery(galleryItems) {
   return galleryItems.map(({ preview, description }) => {
     return `<li class="gallery__item"><img class="gallery__image" src="${preview}" alt="${description}"></li>`
   }).join('');
 };
 
-
+// Открытие модального окна по клику на элементе галереи.
 function onDocumentClick(event) {
   if (event.target.tagName !== 'IMG') return false;
 
@@ -108,7 +107,7 @@ function modalOpen() {
 };
 
 
-
+// close modal window
 function modalClose() {
   refs.divLightbox.classList.remove('is-open');
   refs.imgLightbox.setAttribute('src', '');
@@ -169,4 +168,8 @@ function getCurrentIndex() {
   });
   return lightboxIndex;
 };
+
+
+
+
 
